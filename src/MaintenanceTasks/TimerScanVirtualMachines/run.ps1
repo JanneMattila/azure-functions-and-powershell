@@ -11,7 +11,7 @@ else {
     Write-Host "Found $($response.VirtualMachines.Count) virtual machines with schedule violation."
 
     $message = @"
-Below virtual machines were still running outside the allowed schedule. They have now been de-allocated. `n
+Below virtual machines were still running outside the allowed schedule. They have been now de-allocated. `n
 
 | Name | Resource Group | Subscription |
 | ---- | -------------- | ------------ |
@@ -27,7 +27,7 @@ Below virtual machines were still running outside the allowed schedule. They hav
         text  = $message
     }
     $body = ConvertTo-Json $data
-    Invoke-RestMethod -Body $body -ContentType "application/json" -Method "POST" -DisableKeepAlive -Uri $url # $env:WebhookUrl
+    Invoke-RestMethod -Body $body -ContentType "application/json" -Method "POST" -DisableKeepAlive -Uri $env:WebhookUrl
 }
 
 Write-Host "Scan finished."
