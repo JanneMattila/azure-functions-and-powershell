@@ -1,14 +1,20 @@
 using namespace System.Net
 
-# Input bindings are passed in via param block.
 param($Request, $TriggerMetadata)
 
-# Write to the Azure Functions log stream.
-Write-Host "PowerShell HTTP trigger function processed a request."
+Write-Host "Scan Virtual Machine function triggered by HTTP request."
 
-$response = .\Scripts\ScanVirtualMachines.ps1 -Param1 $Request.Query.Name -Param2 $Request.Query.Age
+$count = 100
+if ($Request.Query.Count) {
+    $count = [int]$Request.Query.Count
+}
 
-# Associate values to output bindings by calling 'Push-OutputBinding'.
+$response = .\Scripts\ScanVirtualMachines.ps1 -Count $count
+
+$url = "https://echo.jannemattila.com/api/echo"
+$body = ConvertTo-Json $response
+Invoke-RestMethod -Body $body -ContentType "application/json" -Method "POST" -DisableKeepAlive -Uri $url
+
 Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
         StatusCode = [HttpStatusCode]::OK
         Body       = $response

@@ -10,7 +10,9 @@
 # NOTE: any variables defined that are not environment variables will get reset after the first execution
 
 # Authenticate with Azure PowerShell using MSI.
-Disable-AzContextAutosave -Scope Process | Out-Null
-Connect-AzAccount -Identity
+if ($env:MSI_SECRET) {
+    Disable-AzContextAutosave -Scope Process | Out-Null
+    Connect-AzAccount -Identity
+}
 
 # You can also define functions or aliases that can be referenced in any of your PowerShell functions.
