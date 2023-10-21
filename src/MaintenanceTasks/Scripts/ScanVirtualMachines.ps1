@@ -38,7 +38,7 @@ $virtualMachines = New-Object System.Collections.ArrayList
 
 foreach ($result in $results) {
 
-    # Schedule is defined in "start-end" 24 hour format. Example: "8-16".
+    # Schedule is defined in "start-end" 24 hour format (UTC). Example: "8-16".
     if ($result.Schedule.Contains("-") -eq $false) {
         Write-Warning "Schedule tags value '$($result.Schedule)' for virtual machine $($result.Name) is not in correct 'start-end' in 24 hour format."
         continue
@@ -48,8 +48,24 @@ foreach ($result in $results) {
     $start = [int]$result.Schedule.Split("-")[0]
     $end = [int]$result.Schedule.Split("-")[1]
     $now = [int](Get-Date -Format "HH" -AsUTC)
-    if ($now -ge $start -and $now -le $end) {
-        Write-Host "Virtual machine $($result.Name) is allowed to be running at $now due to schedule '$($result.Schedule)'."
+
+    if ($start -lt $end) {
+        # Example: 8-16
+        if ($now -ge $start -and $now -le $end) {
+            Write-Host "Virtual machine $($result.Name) is allowed to be running at $now due to schedule '$($result.Schedule)'."
+            continue
+        }
+    }
+    elseif ($start -gt $end) {
+        # Example: 22-6
+        if ($now -ge $start -or $now -le $end) {
+            Write-Host "Virtual machine $($result.Name) is allowed to be running at $now due to schedule '$($result.Schedule)'."
+            continue
+        }
+    }
+    else {
+        # Example: 8-8
+        Write-Warning "Invalid schedule '$($result.Schedule)' for virtual machine $($result.Name)."
         continue
     }
 
