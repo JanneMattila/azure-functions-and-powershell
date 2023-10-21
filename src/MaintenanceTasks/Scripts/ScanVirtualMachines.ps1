@@ -7,6 +7,7 @@ $result.Continues
 param (
     [string]$TagName = "schedule",
     [string]$PowerState = "PowerState/running",
+    [switch] $ForceShutdown,
     [int]$Count = 10
 )
 
@@ -26,7 +27,7 @@ resources
 | extend PowerState = tostring(properties.extended.instanceView.powerState.code)
 | where PowerState == '$PowerState'
 | project subscriptionId, resourceGroup, name, schedule, location
-| project-rename  Subscription = subscriptionId, ResourceGroup = resourceGroup, Name = name, Schedule = schedule, Location = location
+| project-rename Subscription = subscriptionId, ResourceGroup = resourceGroup, Name = name, Schedule = schedule, Location = location
 | order by Subscription, ResourceGroup, Name
 "@
 Write-Host $query
@@ -70,6 +71,12 @@ foreach ($result in $results) {
     }
 
     Write-Host "Virtual machine $($result.Name) should not be running at $now due to schedule '$($result.Schedule)'."
+
+    if ($ForceShutdown) {
+        Write-Host "Shutting down virtual machine $($result.Name)."
+        Select-AzSubscription -SubscriptionId $result.Subscription
+        Stop-AzVM -Name $result.Name -ResourceGroupName $result.ResourceGroup -Force -NoWait
+    }
 
     $virtualMachineData = [VirtualMachineData]::new()
     $virtualMachineData.Name = $result.Name
