@@ -28,14 +28,20 @@ Describe 'ScanVirtualMachines' -ForEach @(
         Expected    = 0
     }
     @{
-        Name        = "vm--not-ok1";
+        Name        = "vm-not-ok1";
         Schedule    = '8-16';
         CurrentTime = '7'
         Expected    = 1
     }
     @{
-        Name        = "vm--not-ok2";
+        Name        = "vm-not-ok2";
         Schedule    = '20-04';
+        CurrentTime = '19'
+        Expected    = 1
+    }
+    @{
+        Name        = "vm-invalid";
+        Schedule    = '20-20';
         CurrentTime = '19'
         Expected    = 1
     }

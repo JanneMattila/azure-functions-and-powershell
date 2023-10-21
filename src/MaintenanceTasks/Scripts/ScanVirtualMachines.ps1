@@ -66,8 +66,7 @@ foreach ($result in $results) {
     }
     else {
         # Example: 8-8
-        Write-Warning "Invalid schedule '$($result.Schedule)' for virtual machine $($result.Name)."
-        continue
+        Write-Warning "Invalid schedule '$($result.Schedule)' for virtual machine $($result.Name). This machine will be shut down."
     }
 
     Write-Host "Virtual machine $($result.Name) should not be running at $now due to schedule '$($result.Schedule)'."
