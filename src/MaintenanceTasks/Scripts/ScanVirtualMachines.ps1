@@ -30,10 +30,10 @@ resources
 | project-rename Id = ['id'], Subscription = subscriptionId, ResourceGroup = resourceGroup, Name = name, Schedule = schedule, Location = location
 | order by Subscription, ResourceGroup, Name
 "@
-$query
+Write-Verbose $query
 
 $results = Search-AzGraph -Query $query -First $Count
-$results | Format-Table
+$results | Format-Table | Out-String | Write-Verbose
 
 $virtualMachines = New-Object System.Collections.ArrayList
 
@@ -53,14 +53,14 @@ foreach ($result in $results) {
     if ($start -lt $end) {
         # Example: 8-16
         if ($now -ge $start -and $now -le $end) {
-            Write-Host "Virtual machine $($result.Name) is allowed to be running at $now due to schedule '$($result.Schedule)'."
+            Write-Information "Virtual machine $($result.Name) is allowed to be running at $now due to schedule '$($result.Schedule)'."
             continue
         }
     }
     elseif ($start -gt $end) {
         # Example: 22-6
         if ($now -ge $start -or $now -le $end) {
-            Write-Host "Virtual machine $($result.Name) is allowed to be running at $now due to schedule '$($result.Schedule)'."
+            Write-Information "Virtual machine $($result.Name) is allowed to be running at $now due to schedule '$($result.Schedule)'."
             continue
         }
     }
@@ -69,10 +69,10 @@ foreach ($result in $results) {
         Write-Warning "Invalid schedule '$($result.Schedule)' for virtual machine $($result.Name). This machine will be shut down."
     }
 
-    Write-Host "Virtual machine $($result.Name) should not be running at $now due to schedule '$($result.Schedule)'."
+    Write-Information "Virtual machine $($result.Name) should not be running at $now due to schedule '$($result.Schedule)'."
 
     if ($ForceShutdown) {
-        Write-Host "Shutting down virtual machine $($result.Name)."
+        Write-Information "Shutting down virtual machine $($result.Name)."
         Invoke-AzRestMethod -Method POST -Uri "https://management.azure.com/$($result.Id)/deallocate?api-version=2023-07-01"
     }
 
@@ -83,7 +83,7 @@ foreach ($result in $results) {
     $virtualMachineData.Location = $result.Location
     $virtualMachineData.Schedule = $result.Schedule
 
-    $virtualMachines.Add($virtualMachineData)
+    $virtualMachines.Add($virtualMachineData) | Out-Null
 }
 
 return [PSCustomObject]@{
