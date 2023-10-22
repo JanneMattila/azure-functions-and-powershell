@@ -26,11 +26,11 @@ resources
 | extend schedule = tags['$TagName']
 | extend PowerState = tostring(properties.extended.instanceView.powerState.code)
 | where PowerState == '$PowerState'
-| project subscriptionId, resourceGroup, name, schedule, location
-| project-rename Subscription = subscriptionId, ResourceGroup = resourceGroup, Name = name, Schedule = schedule, Location = location
+| project ['id'], subscriptionId, resourceGroup, name, schedule, location
+| project-rename Id = ['id'], Subscription = subscriptionId, ResourceGroup = resourceGroup, Name = name, Schedule = schedule, Location = location
 | order by Subscription, ResourceGroup, Name
 "@
-Write-Host $query
+$query
 
 $results = Search-AzGraph -Query $query -First $Count
 $results | Format-Table
@@ -73,8 +73,7 @@ foreach ($result in $results) {
 
     if ($ForceShutdown) {
         Write-Host "Shutting down virtual machine $($result.Name)."
-        Select-AzSubscription -SubscriptionId $result.Subscription
-        Stop-AzVM -Name $result.Name -ResourceGroupName $result.ResourceGroup -Force -NoWait
+        Invoke-AzRestMethod -Method POST -Uri "https://management.azure.com/$($result.Id)/deallocate?api-version=2023-07-01"
     }
 
     $virtualMachineData = [VirtualMachineData]::new()
