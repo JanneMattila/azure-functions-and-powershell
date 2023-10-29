@@ -12,6 +12,9 @@ cd MaintenanceTasks
 func new --name HttpScanVirtualMachines --template "HTTP trigger" --authlevel "function"
 func new --name TimerScanVirtualMachines --template "Timer trigger" 
 mkdir Scripts
+echo "# Code here" > Scripts/ScanVirtualMachines.ps1
+mkdir Tests
+echo "# Tests here" > Tests/ScanVirtualMachines.Tests.ps1
 code .
 ```
 
@@ -32,7 +35,7 @@ Test Azure Functions:
 ```powershell
 curl http://localhost:7071/api/ScanVirtualMachines
 
-curl http://localhost:7071/api/ScanVirtualMachines?Name=MyVM
+curl http://localhost:7071/api/ScanVirtualMachines?count=1000
 
 curl --request POST -H "Content-Type: application/json" --data '{}' http://localhost:7071/admin/functions/TimerScanVirtualMachines
 ```
