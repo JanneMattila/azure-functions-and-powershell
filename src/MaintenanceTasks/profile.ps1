@@ -9,6 +9,8 @@
 # You can define helper functions, run commands, or specify environment variables
 # NOTE: any variables defined that are not environment variables will get reset after the first execution
 
+$ErrorActionPreference = "Stop"
+
 # Authenticate with Azure PowerShell using MSI.
 if ($env:MSI_SECRET) {
     Disable-AzContextAutosave -Scope Process | Out-Null

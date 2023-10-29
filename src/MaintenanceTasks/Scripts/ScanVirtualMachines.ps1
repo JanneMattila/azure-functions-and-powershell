@@ -8,6 +8,9 @@ param (
     [string]$TagName = "schedule",
     [string]$PowerState = "PowerState/running",
     [switch] $ForceShutdown,
+
+    [Parameter(HelpMessage = "Maximum number of results to return")]
+    [ValidateRange(10, 1000)]
     [int]$Count = 10
 )
 

@@ -7,6 +7,9 @@ Param (
 
     [Parameter(HelpMessage = "Application name prefix")] 
     [string] $AppPrefix,
+    
+    [Parameter(HelpMessage = "Notification webhook URL")] 
+    [string] $WebhookUrl,
 
     [Parameter(HelpMessage = "Deployment target resource group location")] 
     [string] $Location = "North Europe",
@@ -40,6 +43,8 @@ if ($null -eq (Get-AzResourceGroup -Name $ResourceGroupName -Location $Location 
 
 # Additional parameters that we pass to the template deployment
 $additionalParameters = New-Object -TypeName hashtable
+$additionalParameters['webhookUrl'] = $WebhookUrl
+
 if ($false -eq [string]::IsNullOrEmpty($AppPrefix)) {
     # Override application name prefix from command line
     Write-Host "Overriding application name prefix with '$AppPrefix'"

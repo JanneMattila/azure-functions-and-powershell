@@ -1,4 +1,5 @@
 param appPrefix string
+param webhookUrl string
 param location string = resourceGroup().location
 
 // Create unique name for our web site
@@ -107,6 +108,10 @@ resource appServiceResource 'Microsoft.Web/sites@2022-09-01' = {
                 {
                     name: 'AZURE_ACCOUNT_CLIENT_ID'
                     value: managedIdentity.properties.clientId
+                }
+                {
+                    name: 'WebhookUrl'
+                    value: webhookUrl
                 }
             ]
             ftpsState: 'Disabled'

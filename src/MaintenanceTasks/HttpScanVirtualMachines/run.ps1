@@ -6,7 +6,10 @@ Write-Host "Scan Virtual Machine function triggered by HTTP request."
 
 $count = 1000
 if ($Request.Query.Count) {
-    $count = [int]$Request.Query.Count
+    $value = [int]$Request.Query.Count
+    if ($value -ge 10 -and $value -le 1000) {
+        $count = $value
+    }
 }
 
 $response = ./Scripts/ScanVirtualMachines.ps1 -Count $count
