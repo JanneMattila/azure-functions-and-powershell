@@ -2,7 +2,7 @@ param($Timer)
 
 Write-Host "Scan Virtual Machine function triggered by timer."
 
-$response = .\Scripts\ScanVirtualMachines.ps1 -Count 1000 -ForceShutdown
+$response = ./Scripts/ScanVirtualMachines.ps1 -Count 1000 -ForceShutdown
 
 if ($response.VirtualMachines.Count -eq 0) {
     Write-Host "No virtual machines found with schedule violation."

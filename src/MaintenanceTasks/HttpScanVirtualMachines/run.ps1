@@ -9,7 +9,7 @@ if ($Request.Query.Count) {
     $count = [int]$Request.Query.Count
 }
 
-$response = .\Scripts\ScanVirtualMachines.ps1 -Count $count
+$response = ./Scripts/ScanVirtualMachines.ps1 -Count $count
 
 Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
         StatusCode = [HttpStatusCode]::OK

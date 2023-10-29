@@ -4,6 +4,7 @@ param location string = resourceGroup().location
 // Create unique name for our web site
 var appName = '${appPrefix}${uniqueString(resourceGroup().id)}'
 var storageSuffix = uniqueString(resourceGroup().id)
+var appInsightsName = 'ai-${appPrefix}'
 
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
     name: 'id-${appPrefix}'
@@ -34,6 +35,7 @@ module monitor 'monitor.bicep' = {
     name: 'monitor-deployment'
     params: {
         appName: appPrefix
+        appInsightsName: appInsightsName
         principalId: managedIdentity.properties.principalId
         location: location
     }
@@ -62,14 +64,6 @@ resource appServiceResource 'Microsoft.Web/sites@2022-09-01' = {
     properties: {
         siteConfig: {
             appSettings: [
-                // {
-                //     name: 'AzureWebJobsDisableHomepage'
-                //     value: 'true'
-                // }
-                // {
-                //     name: 'AzureWebJobsStorage'
-                //     value: storage.outputs.storageConnectionString
-                // }
                 {
                     name: 'AzureWebJobsStorage__accountName'
                     value: storage.outputs.storageName
@@ -102,22 +96,17 @@ resource appServiceResource 'Microsoft.Web/sites@2022-09-01' = {
                     name: 'WEBSITE_RUN_FROM_PACKAGE'
                     value: '1'
                 }
-                // {
-                //     // https://learn.microsoft.com/en-us/azure/azure-functions/run-functions-from-deployment-package#fetch-a-package-from-azure-blob-storage-using-a-managed-identity
-                //     name: 'WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID'
-                //     value: managedIdentity.id
-                // }
-                // {
-                //     name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-                //     value: monitor.outputs.appInsightsKey
-                // }
                 {
                     name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-                    value: monitor.outputs.appInsightsconnectionString
+                    value: monitor.outputs.appInsightsConnectionString
                 }
                 {
                     name: 'WEBSITE_TIME_ZONE'
                     value: 'E. Europe Standard Time'
+                }
+                {
+                    name: 'AZURE_ACCOUNT_CLIENT_ID'
+                    value: managedIdentity.properties.clientId
                 }
             ]
             ftpsState: 'Disabled'
@@ -129,6 +118,9 @@ resource appServiceResource 'Microsoft.Web/sites@2022-09-01' = {
         serverFarmId: appServicePlan.id
         clientAffinityEnabled: false
         httpsOnly: true
+    }
+    tags: {
+        'hidden-link: /app-insights-resource-id': resourceId('Microsoft.Insights/components', appInsightsName)
     }
 }
 

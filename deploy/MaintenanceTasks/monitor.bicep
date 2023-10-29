@@ -1,4 +1,5 @@
 param appName string
+param appInsightsName string
 param principalId string
 param location string
 
@@ -12,13 +13,15 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10
 }
 
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: 'ai-${appName}'
+  name: appInsightsName
   location: location
   kind: 'web'
   properties: {
     Application_Type: 'web'
     WorkspaceResourceId: logAnalyticsWorkspace.id
-    DisableLocalAuth: true
+    // https://learn.microsoft.com/en-us/azure/azure-monitor/app/azure-ad-authentication?tabs=net#unsupported-scenarios
+    // Codeless monitoring does not yet support Entra ID authentication
+    DisableLocalAuth: false
   }
 }
 
@@ -31,4 +34,4 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope: appInsights
 }
 
-output appInsightsconnectionString string = appInsights.properties.ConnectionString
+output appInsightsConnectionString string = appInsights.properties.ConnectionString

@@ -3,14 +3,17 @@
 ```powershell
 $result = .\deploy.ps1
 
+$result.Outputs | Format-List
 $result.Outputs["funcApp"].value
 $result.Outputs["funcAppUri"].value
 
 $funcApp = $result.Outputs["funcApp"].value
 $funcAppUri = $result.Outputs["funcAppUri"].value
 
-cd ../../src/MaintenanceTasks/
+pushd ../../src/MaintenanceTasks/
 func azure functionapp publish $funcApp
+popd
+
 $subscriptionId = (Get-AzContext).Subscription.Id
 $resourceGroupName = "rg-maintenance-tasks"
 $functionName = "HttpScanVirtualMachines"

@@ -12,7 +12,14 @@
 # Authenticate with Azure PowerShell using MSI.
 if ($env:MSI_SECRET) {
     Disable-AzContextAutosave -Scope Process | Out-Null
-    Connect-AzAccount -Identity
+    if ($env:AZURE_ACCOUNT_CLIENT_ID) {
+        # Use User Assigned Managed Identity
+        Connect-AzAccount -Identity -AccountId $env:AZURE_ACCOUNT_CLIENT_ID
+    }
+    else {
+        # Use System Assigned Managed Identity
+        Connect-AzAccount -Identity
+    }
 }
 
 # You can also define functions or aliases that can be referenced in any of your PowerShell functions.
