@@ -12,7 +12,7 @@ if ($Request.Query.Count) {
     }
 }
 
-$response = ./Scripts/ScanVirtualMachines.ps1 -Count $count
+$response = . $env:FUNCTIONS_APPLICATION_DIRECTORY/Scripts/ScanVirtualMachines.ps1 -Count $count
 
 Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
         StatusCode = [HttpStatusCode]::OK
