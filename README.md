@@ -50,7 +50,7 @@ Import-Module Pester -PassThru
 Test
 
 ```powershell
-Invoke-Pester -Output Detailed src\MaintenanceTasks\Tests\ScanVirtualMachines.Tests.ps1
+Invoke-Pester -Output Detailed src\MaintenanceTasks\Tests\*.Tests.ps1
 ```
 
 Output:
